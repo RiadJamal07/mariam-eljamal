@@ -163,6 +163,12 @@ h3 {
   place-items: center;
   background: var(--canvas);
   overflow: hidden;
+  /* pure-CSS bail-out: even if every script dies, the preloader self-destructs */
+  animation: preloader-bail 0.45s ease 4.6s forwards;
+}
+
+@keyframes preloader-bail {
+  to { opacity: 0; visibility: hidden; }
 }
 
 .pre-wordmark {
@@ -171,7 +177,13 @@ h3 {
   font-size: clamp(3rem, 11vw, 11rem);
   letter-spacing: -0.04em;
   transform: translateX(-115%);
-  opacity: 0; /* revealed by the intro — never show the parked (cropped) state */
+  opacity: 0;
+  /* the slide-in is pure CSS — it can never park half-cropped waiting on JS */
+  animation: pre-slide 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+}
+
+@keyframes pre-slide {
+  to { transform: translateX(0); opacity: 1; }
 }
 
 .no-anim .preloader { display: none; }
@@ -613,16 +625,22 @@ h3 {
   margin: 90px calc(-1 * var(--gutter)) 0 -28px;
 }
 
-/* Full-bleed under the fixed sidebar; cards pass beneath its glass */
+/* Full-bleed under the fixed sidebar; cards pass beneath its glass.
+   width: 100vw (not negative right margin) — .main is max-width capped,
+   so only viewport units reach the true right edge on wide screens. */
 @media (min-width: 901px) {
-  .section-dark { margin-left: calc(-1 * (var(--sidebar-w) + var(--gutter) * 2 + 28px)); }
+  .section-dark {
+    margin-left: calc(-1 * (var(--sidebar-w) + var(--gutter) * 2 + 28px));
+    margin-right: 0;
+    width: 100vw;
+  }
   .work-head, .work-hint { padding-left: calc(var(--sidebar-w) + var(--gutter) * 2 + 40px); }
   .work-sticky .work-track { padding-left: 48vw; } /* cards start right of the headline, nesh-style */
 
   /* static mode: sidebar is opaque and always visible — don't run under it */
   .no-anim .hero-pin { margin-left: 0; }
   .no-anim .hero-wordmark { font-size: clamp(3rem, calc((100vw - 470px) / 3.1), 28rem); }
-  .no-anim .section-dark { margin-left: -28px; }
+  .no-anim .section-dark { margin-left: -28px; width: auto; }
   .no-anim .work-head, .no-anim .work-hint { padding-left: 0; }
   .no-anim .work-sticky .work-track { padding-left: 4px; }
 }

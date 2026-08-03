@@ -6,6 +6,14 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
 const desktop = window.matchMedia('(min-width: 901px)');
 
+// Reload always starts the story from the top — browser scroll restoration
+// would otherwise drop you mid-page with the preloader/pins out of sync.
+if (!new URLSearchParams(location.search).has('qy')) {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+  window.addEventListener('pageshow', () => window.scrollTo(0, 0));
+}
+
 /* ——— Utilities that work with or without GSAP ——— */
 
 function initCounters(immediate) {
@@ -100,7 +108,6 @@ function main() {
   const sidebarWidgets = gsap.utils.toArray('.sidebar > *');
   const heroFront = gsap.utils.toArray('.hero-title, .hero-actions');
 
-  gsap.set('.pre-wordmark', { xPercent: -115 });
   gsap.set('.ghost-nav a', { autoAlpha: 0, y: -14 });
   gsap.set('.hero-figure', { autoAlpha: 0, yPercent: 8 });
   gsap.set(heroFront, { autoAlpha: 0, y: 26 });
@@ -140,8 +147,8 @@ function main() {
       defaults: { ease: 'expo.out' },
       onComplete: () => { pre?.remove(); initCounters(false); },
     })
-      .to('.pre-wordmark', { xPercent: 0, autoAlpha: 1, duration: 0.65 })
-      .to(pre, { yPercent: -100, duration: 0.55, ease: 'expo.inOut', delay: 0.2 })
+      // (the wordmark slide-in is a CSS animation — JS only lifts the overlay)
+      .to(pre, { yPercent: -100, duration: 0.55, ease: 'expo.inOut', delay: 0.25 })
       // Wordmark rises out of its mask as one piece (® breaks char-splitting)
       .from('.hero-wordmark', { yPercent: 112, duration: 0.75 }, '-=0.28')
       .to('.hero-figure', { autoAlpha: 1, yPercent: 0, duration: 0.7 }, '-=0.55')
