@@ -108,10 +108,35 @@ function initButtonSwap() {
   });
 }
 
+// Fit MARIAM® exactly to its container by measuring, not math: Bricolage is
+// a variable font whose glyph proportions shift with optical size, so no
+// fixed vw formula is right at every width. Two passes absorb that shift.
+function initWordmarkFit() {
+  const wm = document.querySelector('.hero-wordmark');
+  if (!wm) return;
+  const fit = () => {
+    const target = wm.parentElement.clientWidth;
+    if (!target) return;
+    // width:max-content shrink-wraps the block so rect.width IS the text width
+    wm.style.width = 'max-content';
+    let size = 100;
+    for (let pass = 0; pass < 2; pass++) {
+      wm.style.fontSize = size + 'px';
+      size = size * (target / wm.getBoundingClientRect().width);
+    }
+    wm.style.fontSize = (size * 0.995) + 'px';
+    wm.style.width = '';
+  };
+  (document.fonts?.ready ?? Promise.resolve()).then(fit);
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(fit, 150); });
+}
+
 initMenuSpy();
 initEmailCopy();
 initButtonSwap();
 initAnchors();
+initWordmarkFit();
 
 /* ——— Static fallback: no GSAP or reduced motion ——— */
 
