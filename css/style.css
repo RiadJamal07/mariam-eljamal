@@ -1013,7 +1013,8 @@ h3 {
   /* Pins unwind on mobile: normal flow, native horizontal scroll */
   .hero-pin { height: auto; }
   .hero-sticky { position: static; height: auto; overflow: visible; padding: 40px 0 60px; }
-  .hero-wordmark { font-size: calc((100vw - 48px) / 3.55); } /* room for the ® */
+  /* MARIAM® in Bricolage 800 ≈ 3.65× the font size — size from that, not hope */
+  .hero-wordmark { font-size: calc((100vw - 44px) / 3.95); }
   .ghost-nav { display: none; }
   .hero-figure {
     position: static;
@@ -1048,6 +1049,11 @@ h3 {
   .tl-card { width: 100%; }
   .timeline { gap: 24px; }
   .tl-year { font-size: 2.4rem; }
+
+  /* static mode on mobile matches the animated layout (no extra padding) */
+  .no-anim .hero-sticky { padding: 40px 0 60px; }
+  .no-anim .hero-figure { max-width: 300px; margin: 28px auto 0; }
+  .no-anim .hero-wordmark { font-size: calc((100vw - 44px) / 3.95); }
 
 }
 
