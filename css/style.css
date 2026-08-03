@@ -1013,15 +1013,15 @@ h3 {
   /* Pins unwind on mobile: normal flow, native horizontal scroll */
   .hero-pin { height: auto; }
   .hero-sticky { position: static; height: auto; overflow: visible; padding: 40px 0 60px; }
-  .hero-wordmark { font-size: calc((100vw - 44px) / 3.1); }
+  .hero-wordmark { font-size: calc((100vw - 48px) / 3.55); } /* room for the ® */
   .ghost-nav { display: none; }
   .hero-figure {
     position: static;
     transform: none;
     height: auto;
     aspect-ratio: auto;
-    max-width: 440px;
-    margin-top: 28px;
+    max-width: 300px;
+    margin: 28px auto 0;
   }
   .hero-figure img { height: auto; border-radius: var(--r-md); }
   .hero-figure::after { display: none; }

@@ -16,6 +16,19 @@ if (!new URLSearchParams(location.search).has('qy')) {
   toTop();
   window.addEventListener('load', toTop, { once: true });
   window.addEventListener('pageshow', toTop);
+  // Chrome restores scroll asynchronously, sometimes after 'load' — hold the
+  // page at the top for the first ~1.5s unless the user starts scrolling.
+  let userMoved = false;
+  ['wheel', 'touchstart', 'keydown'].forEach((ev) =>
+    window.addEventListener(ev, () => { userMoved = true; }, { once: true, passive: true })
+  );
+  let frames = 0;
+  const enforce = () => {
+    if (userMoved) return;
+    if (window.scrollY !== 0) window.scrollTo(0, 0);
+    if (++frames < 90) requestAnimationFrame(enforce);
+  };
+  requestAnimationFrame(enforce);
 }
 
 // Anchor navigation scrolls without ever writing a #hash into the URL.
@@ -114,6 +127,7 @@ if (!hasGsap || reduceMotion || staticMode) {
 
 function main() {
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.clearScrollMemory('manual');
   const hasSplit = typeof SplitText !== 'undefined';
   if (hasSplit) gsap.registerPlugin(SplitText);
 
@@ -140,6 +154,46 @@ function main() {
     new Promise((r) => setTimeout(r, 1200)),
   ]);
 
+  // The hero exit scrub and sidebar assembly must be built only AFTER the
+  // intro has finished revealing everything: scrubbed .to() tweens capture
+  // their start values at build time, and capturing mid-intro (elements
+  // still hidden) bakes a broken state that reappears on every scroll-up.
+  let heroScrubsBuilt = false;
+  function buildHeroScrubs() {
+    if (heroScrubsBuilt || !desktop.matches) return;
+    heroScrubsBuilt = true;
+
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: '.hero-pin',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.4,
+      },
+    })
+      .to('.hero-wordmark', { yPercent: -50, autoAlpha: 0.05, ease: 'none' }, 0)
+      .to('.ghost-nav a', { y: -30, autoAlpha: 0, stagger: 0.03, ease: 'power1.in' }, 0)
+      .to(heroFront, { yPercent: -120, autoAlpha: 0, stagger: 0.04, ease: 'power1.in' }, 0)
+      .to('.hero-corner', { autoAlpha: 0, ease: 'none' }, 0.1)
+      .to('.hero-figure', { yPercent: 14, scale: 0.97, autoAlpha: 0.25, ease: 'none' }, 0.1)
+      .to('.hero-card-projects', { x: '-22vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.05)
+      .to('.hero-card-traits', { x: '18vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.1);
+
+    gsap.to(sidebarWidgets, {
+      autoAlpha: 1, scale: 1, y: 0,
+      stagger: 0.12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.hero-pin',
+        start: '2% top',
+        end: '60% bottom',
+        scrub: 0.4,
+      },
+    });
+
+    ScrollTrigger.refresh();
+  }
+
   const revealAllNow = () => {
     pre?.remove();
     gsap.set([
@@ -147,6 +201,7 @@ function main() {
       '.hero-corner', '.hero-card',
     ], { autoAlpha: 1, x: 0, y: 0, xPercent: 0, yPercent: 0, scale: 1 });
     initCounters(true);
+    buildHeroScrubs();
   };
 
   const qp = new URLSearchParams(location.search);
@@ -162,7 +217,7 @@ function main() {
     if (!document.querySelector('.preloader')) return;
     gsap.timeline({
       defaults: { ease: 'expo.out' },
-      onComplete: () => { pre?.remove(); initCounters(false); },
+      onComplete: () => { pre?.remove(); initCounters(false); buildHeroScrubs(); },
     })
       // (the wordmark slide-in is a CSS animation — JS only lifts the overlay)
       .to(pre, { yPercent: -100, duration: 0.55, ease: 'expo.inOut', delay: 0.25 })
@@ -175,44 +230,10 @@ function main() {
       .to('.hero-card', { autoAlpha: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.5)', stagger: 0.09 }, '-=0.35');
   });
 
-  // Sidebar assembles piece-by-piece scrubbed to hero progress (nesh move) —
-  // and disassembles again when you scroll back to the top.
-  if (desktop.matches) {
-    gsap.to(sidebarWidgets, {
-      autoAlpha: 1, scale: 1, y: 0,
-      stagger: 0.12,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.hero-pin',
-        start: '2% top',
-        end: '60% bottom',
-        scrub: 0.4,
-      },
-    });
-  }
-
-  /* ——— Hero exit: pinned stage dissolves as you scroll (desktop) ——— */
+  /* ——— Work: vertical scroll drives horizontal travel (desktop) ——— */
 
   ScrollTrigger.matchMedia({
     '(min-width: 901px)': () => {
-      // Transform/opacity only — no blur or letter-spacing, they jank the scrub.
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: '.hero-pin',
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 0.4,
-        },
-      })
-        .to('.hero-wordmark', { yPercent: -50, autoAlpha: 0.05, ease: 'none' }, 0)
-        .to('.ghost-nav a', { y: -30, autoAlpha: 0, stagger: 0.03, ease: 'power1.in' }, 0)
-        .to(heroFront, { yPercent: -120, autoAlpha: 0, stagger: 0.04, ease: 'power1.in' }, 0)
-        .to('.hero-corner', { autoAlpha: 0, ease: 'none' }, 0.1)
-        .to('.hero-figure', { yPercent: 14, scale: 0.97, autoAlpha: 0.25, ease: 'none' }, 0.1)
-        .to('.hero-card-projects', { x: '-22vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.05)
-        .to('.hero-card-traits', { x: '18vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.1);
-
-      /* ——— Work: vertical scroll drives horizontal travel ——— */
       const track = document.querySelector('.work-track');
       const sticky = document.querySelector('.work-sticky');
       if (track && sticky) {
