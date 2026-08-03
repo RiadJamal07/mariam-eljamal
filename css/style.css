@@ -371,7 +371,6 @@ h3 {
 .main {
   margin-left: calc(var(--sidebar-w) + var(--gutter) * 2);
   padding: 0 var(--gutter) 0 28px;
-  max-width: 1500px;
 }
 
 .section { padding: 130px 0 40px; }
@@ -392,7 +391,7 @@ h3 {
 @media (min-width: 901px) {
   .hero-pin { margin-left: calc(-1 * (var(--sidebar-w) + var(--gutter) * 2 + 28px)); }
   .hero-sticky { padding-left: 40px; padding-right: 40px; }
-  .hero-wordmark { font-size: clamp(4rem, calc((100vw - 80px) / 3.1), 28rem); }
+  .hero-wordmark { font-size: clamp(4rem, calc((100vw - 80px) / 3.1), 40rem); }
 }
 
 .wm-mask { overflow: hidden; position: relative; z-index: 0; }
