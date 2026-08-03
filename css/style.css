@@ -401,8 +401,7 @@ h3 {
   font-family: var(--font-display);
   font-weight: 800;
   font-size: clamp(4rem, calc((100vw - 400px) / 3.1), 28rem);
-  /* line box must cover the full ascent — the mask clips anything above it */
-  line-height: 1.04;
+  line-height: 0.92;
   letter-spacing: -0.04em;
   white-space: nowrap;
   color: var(--accent);

@@ -124,10 +124,17 @@ function initWordmarkFit() {
       wm.style.fontSize = size + 'px';
       size = size * (target / wm.getBoundingClientRect().width);
     }
-    wm.style.fontSize = (size * 0.995) + 'px';
+    wm.style.fontSize = (size * 0.99) + 'px';
     wm.style.width = '';
   };
+  // fonts.ready can resolve before the face even starts loading — force-load
+  // the exact face first so we never measure the fallback font, and refit
+  // late as insurance against slow swaps and scrollbar appearance.
+  const load = document.fonts?.load?.('800 100px "Bricolage Grotesque"');
+  (load ?? Promise.resolve()).then(fit, fit);
   (document.fonts?.ready ?? Promise.resolve()).then(fit);
+  setTimeout(fit, 800);
+  setTimeout(fit, 2000);
   let t;
   window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(fit, 150); });
 }
