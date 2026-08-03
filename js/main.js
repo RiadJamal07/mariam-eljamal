@@ -128,6 +128,10 @@ if (!hasGsap || reduceMotion || staticMode) {
 function main() {
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.clearScrollMemory('manual');
+
+  // The animation system is built for one breakpoint at init (scrubs, curve,
+  // sidebar states). Crossing 900px mid-session re-initializes cleanly.
+  desktop.addEventListener('change', () => location.reload());
   const hasSplit = typeof SplitText !== 'undefined';
   if (hasSplit) gsap.registerPlugin(SplitText);
 
