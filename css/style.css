@@ -174,9 +174,18 @@ h3 {
 
 .no-anim .preloader { display: none; }
 
-/* Static mode (reduced motion / no GSAP): pins unwind, hero keeps its poster */
-.no-anim .hero-pin { height: 100vh; }
-.no-anim .hero-sticky { position: relative; }
+/* Static mode (reduced motion / no GSAP): everything unwinds to normal flow */
+.no-anim .hero-pin { height: auto; }
+.no-anim .hero-sticky { position: static; height: auto; overflow: visible; padding: 50px 40px 70px; }
+.no-anim .hero-figure { position: static; transform: none; height: auto; max-width: 340px; margin-top: 36px; }
+.no-anim .hero-front { position: static; transform: none; text-align: left; margin-top: 32px; }
+.no-anim .hero-front .hero-actions { justify-content: flex-start; }
+.no-anim .hero-title { color: var(--ink); text-shadow: none; }
+.no-anim .hero-corner { position: static; margin-top: 16px; max-width: 340px; }
+.no-anim .hero-card { position: static; margin: 14px 0 0; max-width: 320px; }
+@media (min-width: 901px) {
+  .no-anim .ghost-nav { display: none; } /* sidebar is visible instead */
+}
 .no-anim .work-pin { height: auto; }
 .no-anim .work-sticky { position: static; height: auto; overflow: visible; padding: 100px 28px 60px; }
 .no-anim .work-track { width: auto; overflow-x: auto; }
@@ -410,39 +419,29 @@ h3 {
 
 .ghost-nav a:hover { color: var(--accent); }
 
-/* Mariam stands bottom-center, over the wordmark */
+/* Mariam stands bottom-center as a cutout, over the wordmark (nesh) */
 .hero-figure {
   position: absolute;
   z-index: 1;
   left: 50%;
-  bottom: 0;
+  bottom: -2px;
   transform: translateX(-50%);
-  height: min(62vh, 58vw);
-  aspect-ratio: 514 / 540;
+  height: min(74vh, 100vw);
+  aspect-ratio: 380 / 620;
 }
 
 .hero-figure img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: var(--r-md) var(--r-md) 0 0;
-}
-
-/* legibility gradient under the overlaid title */
-.hero-figure::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: var(--r-md) var(--r-md) 0 0;
-  background: linear-gradient(180deg, transparent 40%, rgba(10, 8, 6, 0.62));
 }
 
 .hero-front {
   position: absolute;
   z-index: 2;
   left: 50%;
-  bottom: 7vh;
-  transform: translateX(-62%);
+  bottom: 6vh;
+  transform: translateX(-50%);
+  text-align: center;
 }
 
 .hero-title {
@@ -452,8 +451,11 @@ h3 {
   line-height: 1.0;
   letter-spacing: -0.02em;
   color: #FFF6EC;
-  margin-bottom: 26px;
+  text-shadow: 0 2px 30px rgba(26, 26, 26, 0.35);
+  margin-bottom: 24px;
 }
+
+.hero-actions { justify-content: center; }
 
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
@@ -581,12 +583,26 @@ h3 {
   border: 1px solid var(--glass-border);
 }
 
-/* ——— Dark work section: pinned, cards travel horizontally ——— */
+/* ——— Dark work section: full-bleed, pinned, cards travel horizontally ——— */
 
 .section-dark {
   background: linear-gradient(#000, #33261C 55%);
   color: #fff;
   margin: 90px calc(-1 * var(--gutter)) 0 -28px;
+}
+
+/* Full-bleed under the fixed sidebar; cards pass beneath its glass */
+@media (min-width: 901px) {
+  .section-dark { margin-left: calc(-1 * (var(--sidebar-w) + var(--gutter) * 2 + 28px)); }
+  .work-head, .work-hint { padding-left: calc(var(--sidebar-w) + var(--gutter) * 2 + 40px); }
+  .work-sticky .work-track { padding-left: 48vw; } /* cards start right of the headline, nesh-style */
+
+  /* static mode: sidebar is opaque and always visible — don't run under it */
+  .no-anim .hero-pin { margin-left: 0; }
+  .no-anim .hero-wordmark { font-size: clamp(3rem, calc((100vw - 470px) / 3.1), 28rem); }
+  .no-anim .section-dark { margin-left: -28px; }
+  .no-anim .work-head, .no-anim .work-hint { padding-left: 0; }
+  .no-anim .work-sticky .work-track { padding-left: 4px; }
 }
 
 .work-pin { height: 200vh; }

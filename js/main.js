@@ -92,24 +92,9 @@ function main() {
   const hasSplit = typeof SplitText !== 'undefined';
   if (hasSplit) gsap.registerPlugin(SplitText);
 
-  /* ——— Lenis smooth scroll wired to ScrollTrigger ——— */
-  if (typeof Lenis !== 'undefined') {
-    const lenis = new Lenis({ lerp: 0.22, wheelMultiplier: 1.35 });
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
-    gsap.ticker.lagSmoothing(0);
-    // Anchor links go through Lenis so pinned sections scroll correctly
-    document.querySelectorAll('a[href^="#"]').forEach((a) => {
-      a.addEventListener('click', (e) => {
-        const target = document.querySelector(a.getAttribute('href'));
-        if (!target) return;
-        e.preventDefault();
-        lenis.scrollTo(target, { offset: 0, duration: 1.4 });
-      });
-    });
-  }
+  /* Native scroll — no smoothing layer, 1:1 with the wheel. */
 
-  /* ——— Intro: preloader → sidebar assembles → hero enters ——— */
+  /* ——— Intro: preloader → hero enters → sidebar assembles on scroll ——— */
 
   const pre = document.querySelector('.preloader');
   const sidebarWidgets = gsap.utils.toArray('.sidebar > *');
@@ -237,7 +222,7 @@ function main() {
     });
   });
 
-  gsap.utils.toArray('.tl-card, .service-card, .faq-card, .chat-row').forEach((el, i) => {
+  gsap.utils.toArray('.service-card, .faq-card, .chat-row').forEach((el, i) => {
     gsap.from(el, {
       autoAlpha: 0, scale: 0.88, y: 30, duration: 1.0, ease: 'expo.out',
       delay: (i % 3) * 0.08,
@@ -251,27 +236,27 @@ function main() {
     scrollTrigger: { trigger: '.work-pin', start: 'top 55%' },
   });
 
-  /* ——— Timeline line draws itself ——— */
+  /* ——— Timeline: one choreographed build — the line draws down and the
+     year cards cascade after it, regardless of how tall the screen is ——— */
 
-  gsap.from('.timeline-line', {
-    scaleY: 0,
-    transformOrigin: 'top center',
-    ease: 'none',
-    scrollTrigger: {
-      trigger: '.timeline',
-      start: 'top 75%',
-      end: 'bottom 65%',
-      scrub: 0.5,
-    },
-  });
-
-  // Year numerals slide in with a small overshoot
-  gsap.utils.toArray('.tl-year').forEach((el) => {
-    gsap.from(el, {
-      x: -34, autoAlpha: 0, duration: 0.8, ease: 'back.out(1.7)',
-      scrollTrigger: { trigger: el, start: 'top 85%' },
+  const timeline = document.querySelector('.timeline');
+  if (timeline) {
+    const cards = gsap.utils.toArray('.tl-card');
+    const build = gsap.timeline({
+      defaults: { ease: 'expo.out' },
+      scrollTrigger: { trigger: timeline, start: 'top 72%' },
     });
-  });
+    build.from('.timeline-line', {
+      scaleY: 0, transformOrigin: 'top center', duration: 1.8, ease: 'power2.inOut',
+    }, 0);
+    cards.forEach((card, i) => {
+      const at = 0.15 + i * 0.22;
+      build.from(card, { autoAlpha: 0, x: -44, y: 20, scale: 0.96, duration: 0.9 }, at);
+      build.from(card.querySelector('.tl-year'), {
+        x: -28, autoAlpha: 0, duration: 0.6, ease: 'back.out(1.7)',
+      }, at + 0.12);
+    });
+  }
 
   /* ——— Capability pills scale in mid-sentence ——— */
 

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 620" role="img" aria-label="Illustration of Mariam holding a coffee cup">
+  <!-- ground shadow -->
+  <ellipse cx="190" cy="602" rx="122" ry="13" fill="rgba(26,26,26,0.14)"/>
+
+  <!-- abaya -->
+  <path d="M190,232 C252,232 280,268 285,320 L305,552 Q308,590 190,592 Q72,590 75,552 L95,320 C100,268 128,232 190,232 Z" fill="#1A1A1A"/>
+  <!-- abaya sheen -->
+  <path d="M132,300 C128,380 122,470 118,540 Q140,548 160,550 C158,470 160,380 166,308 Z" fill="#262626"/>
+
+  <!-- bag strap -->
+  <path d="M136,268 L250,470" stroke="#C79A45" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- bag -->
+  <rect x="236" y="462" width="62" height="44" rx="10" fill="#0E0E0E"/>
+  <rect x="258" y="478" width="18" height="10" rx="3" fill="#C79A45"/>
+
+  <!-- hijab -->
+  <path d="M190,42
+           C118,42 86,98 86,162
+           C86,204 94,232 76,272
+           C68,290 80,300 100,295
+           C128,288 148,268 156,238
+           C150,262 148,286 154,306
+           C128,316 112,336 108,358
+           C158,384 222,384 272,358
+           C268,336 252,316 226,306
+           C232,286 230,262 224,238
+           C232,268 252,288 280,295
+           C300,300 312,290 304,272
+           C286,232 294,204 294,162
+           C294,98 262,42 190,42 Z" fill="#F2E6D5"/>
+  <!-- hijab inner shade -->
+  <path d="M190,318 C160,318 136,312 120,304 C150,322 230,322 260,304 C244,312 220,318 190,318 Z" fill="#E7D4B5"/>
+  <path d="M132,206 Q190,252 248,206 Q236,244 190,248 Q144,244 132,206 Z" fill="#E7D4B5"/>
+
+  <!-- face -->
+  <ellipse cx="190" cy="152" rx="62" ry="70" fill="#F4C49C"/>
+  <!-- brows -->
+  <path d="M146,126 Q162,117 177,123" stroke="#4A3526" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <path d="M203,123 Q218,117 234,126" stroke="#4A3526" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <!-- eyes -->
+  <ellipse cx="163" cy="152" rx="13.5" ry="17" fill="#1A1A1A"/>
+  <ellipse cx="217" cy="152" rx="13.5" ry="17" fill="#1A1A1A"/>
+  <circle cx="167.5" cy="145" r="4.4" fill="#FFFFFF"/>
+  <circle cx="221.5" cy="145" r="4.4" fill="#FFFFFF"/>
+  <circle cx="159" cy="158" r="2" fill="#FFFFFF" opacity="0.85"/>
+  <circle cx="213" cy="158" r="2" fill="#FFFFFF" opacity="0.85"/>
+  <!-- lashes -->
+  <path d="M148,146 L141,142" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M232,146 L239,142" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
+  <!-- nose -->
+  <path d="M190,166 q3,6 0,10" stroke="#DB9C72" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- smile -->
+  <path d="M180,188 Q190,196 200,188" stroke="#B5674C" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <!-- blush -->
+  <ellipse cx="149" cy="174" rx="10" ry="6" fill="#E89B85" opacity="0.5"/>
+  <ellipse cx="231" cy="174" rx="10" ry="6" fill="#E89B85" opacity="0.5"/>
+
+  <!-- necklace -->
+  <path d="M162,262 Q190,298 218,262" stroke="#C79A45" stroke-width="2.5" fill="none"/>
+  <circle cx="190" cy="299" r="10.5" fill="#C79A45"/>
+  <text x="190" y="304" font-family="Georgia, serif" font-size="13" font-weight="bold" fill="#6E4E14" text-anchor="middle">M</text>
+
+  <!-- coffee cup -->
+  <path d="M167,340 L213,340 L207,398 Q190,404 173,398 Z" fill="#F7F0E4"/>
+  <rect x="170" y="356" width="40" height="26" fill="#C89F72"/>
+  <path d="M190,362 c-3,-4 -9,-2 -9,3 c0,4 6,7 9,9 c3,-2 9,-5 9,-9 c0,-5 -6,-7 -9,-3 Z" fill="#A9714C"/>
+  <rect x="160" y="326" width="60" height="15" rx="7" fill="#EFE5D2"/>
+  <rect x="176" y="318" width="28" height="10" rx="4" fill="#E2D4BC"/>
+
+  <!-- hands -->
+  <circle cx="161" cy="376" r="13" fill="#F4C49C"/>
+  <circle cx="219" cy="376" r="13" fill="#F4C49C"/>
+  <path d="M154,368 Q150,376 154,384" stroke="#DB9C72" stroke-width="2" fill="none"/>
+  <path d="M226,368 Q230,376 226,384" stroke="#DB9C72" stroke-width="2" fill="none"/>
+</svg>
