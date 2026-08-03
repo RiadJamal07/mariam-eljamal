@@ -6,12 +6,28 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 const hasGsap = typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined';
 const desktop = window.matchMedia('(min-width: 901px)');
 
-// Reload always starts the story from the top — browser scroll restoration
-// would otherwise drop you mid-page with the preloader/pins out of sync.
+// Reload always starts the story from the top. Two separate culprits:
+// scroll restoration, and a #hash in the URL (from nav clicks) that makes
+// the browser jump to that anchor on every reload — strip it.
 if (!new URLSearchParams(location.search).has('qy')) {
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-  window.scrollTo(0, 0);
-  window.addEventListener('pageshow', () => window.scrollTo(0, 0));
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  const toTop = () => window.scrollTo(0, 0);
+  toTop();
+  window.addEventListener('load', toTop, { once: true });
+  window.addEventListener('pageshow', toTop);
+}
+
+// Anchor navigation scrolls without ever writing a #hash into the URL.
+function initAnchors() {
+  document.querySelectorAll('a[href^="#"]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+  });
 }
 
 /* ——— Utilities that work with or without GSAP ——— */
@@ -82,6 +98,7 @@ function initButtonSwap() {
 initMenuSpy();
 initEmailCopy();
 initButtonSwap();
+initAnchors();
 
 /* ——— Static fallback: no GSAP or reduced motion ——— */
 
