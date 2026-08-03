@@ -354,7 +354,9 @@ h3 {
 
 /* ——— Hero: pinned stage ——— */
 
-.hero-pin { height: 280vh; }
+.hero-pin { height: 170vh; }
+
+.wm-mask { overflow: hidden; position: relative; z-index: 0; }
 
 .hero-sticky {
   position: sticky;
@@ -379,18 +381,20 @@ h3 {
 .hero-wordmark {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(3.4rem, 9.6vw, 10.5rem);
+  font-size: clamp(3.4rem, 13vw, 14rem);
   line-height: 0.95;
   letter-spacing: -0.04em;
-  margin-bottom: 8px;
+  white-space: nowrap;
 }
 
 .hero-stage {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
   gap: 48px;
-  align-items: center;
-  margin-top: 20px;
+  align-items: start;
+  margin-top: 10px;
 }
 
 .hero-kicker {
@@ -411,7 +415,10 @@ h3 {
 
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
-.hero-media { position: relative; }
+.hero-media {
+  position: relative;
+  margin-top: -7.5vw; /* illustration climbs over the wordmark, nesh-style */
+}
 
 .hero-media > img {
   width: 100%;
@@ -519,7 +526,7 @@ h3 {
   margin: 90px calc(-1 * var(--gutter)) 0 -28px;
 }
 
-.work-pin { height: 350vh; }
+.work-pin { height: 240vh; }
 
 .work-sticky {
   position: sticky;
@@ -884,7 +891,7 @@ h3 {
   .hero-sticky { position: static; height: auto; overflow: visible; padding: 40px 0 60px; }
   .hero-stage { grid-template-columns: minmax(0, 1fr); }
   .hero-media { margin-top: 40px; max-width: 400px; }
-  .hero-wordmark { font-size: clamp(2.6rem, 14vw, 6rem); }
+  .hero-wordmark { font-size: clamp(2.6rem, 14vw, 6rem); white-space: normal; }
 
   .work-pin { height: auto; }
   .work-sticky { position: static; height: auto; overflow: visible; padding: 90px var(--gutter) 50px; }

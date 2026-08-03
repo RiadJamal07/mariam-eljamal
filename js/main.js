@@ -94,7 +94,7 @@ function main() {
 
   /* ——— Lenis smooth scroll wired to ScrollTrigger ——— */
   if (typeof Lenis !== 'undefined') {
-    const lenis = new Lenis({ lerp: 0.11 });
+    const lenis = new Lenis({ lerp: 0.18, wheelMultiplier: 1.15 });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -116,54 +116,52 @@ function main() {
   const heroCopyBits = gsap.utils.toArray('.hero-kicker, .hero-title, .hero-actions, .hero-scroll-hint');
 
   gsap.set('.pre-wordmark', { xPercent: -115 });
-  gsap.set(sidebarWidgets, { autoAlpha: 0, scale: 0.85, y: 14 });
-  gsap.set('.hero-wordmark', { autoAlpha: 0 });
-  gsap.set(heroCopyBits, { autoAlpha: 0, y: 26 });
-  gsap.set('.hero-media > img', { autoAlpha: 0, scale: 0.94 });
-  gsap.set('.hero-card', { autoAlpha: 0, scale: 0.6, y: 16 });
+  gsap.set(sidebarWidgets, { autoAlpha: 0, scale: 0.9, y: 12 });
+  gsap.set(heroCopyBits, { autoAlpha: 0, y: 22 });
+  gsap.set('.hero-media > img', { autoAlpha: 0, scale: 0.96 });
+  gsap.set('.hero-card', { autoAlpha: 0, scale: 0.7, y: 14 });
 
-  const intro = gsap.timeline({
-    defaults: { ease: 'expo.out' },
-    onComplete: () => { pre?.remove(); initCounters(false); },
+  // Wait for the display font (capped at 1.2s) so the preloader wordmark
+  // never slides in mid-fontswap — that's what "mangled" looks like.
+  const fontsReady = Promise.race([
+    document.fonts?.ready ?? Promise.resolve(),
+    new Promise((r) => setTimeout(r, 1200)),
+  ]);
+
+  fontsReady.then(() => {
+    gsap.timeline({
+      defaults: { ease: 'expo.out' },
+      onComplete: () => { pre?.remove(); initCounters(false); },
+    })
+      .to('.pre-wordmark', { xPercent: 0, duration: 0.7 })
+      .to(pre, { yPercent: -100, duration: 0.6, ease: 'expo.inOut', delay: 0.25 })
+      // Whole wordmark rises out of its own mask — no char splitting,
+      // so the ® superscript can't break the metrics.
+      .from('.hero-wordmark', { yPercent: 112, duration: 0.8 }, '-=0.3')
+      .to(sidebarWidgets, { autoAlpha: 1, scale: 1, y: 0, duration: 0.55, stagger: 0.05 }, '-=0.5')
+      .to(heroCopyBits, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.07 }, '-=0.45')
+      .to('.hero-media > img', { autoAlpha: 1, scale: 1, duration: 0.7 }, '-=0.5')
+      .to('.hero-card', { autoAlpha: 1, scale: 1, y: 0, duration: 0.55, ease: 'back.out(1.5)', stagger: 0.1 }, '-=0.35');
   });
-
-  intro
-    .to('.pre-wordmark', { xPercent: 0, duration: 0.9 })
-    .to('.pre-wordmark', { xPercent: 115, duration: 0.7, ease: 'expo.in', delay: 0.35 })
-    .to(pre, { yPercent: -100, duration: 0.65, ease: 'expo.inOut' }, '-=0.15')
-    .to('.hero-wordmark', { autoAlpha: 1, duration: 0.01 }, '-=0.4');
-
-  // Wordmark letters rise out of a mask
-  if (hasSplit) {
-    const wm = new SplitText('.hero-wordmark', { type: 'chars', mask: 'chars' });
-    intro.from(wm.chars, { yPercent: 110, duration: 0.9, stagger: 0.045 }, '<');
-  } else {
-    intro.from('.hero-wordmark', { y: 60, duration: 0.9 }, '<');
-  }
-
-  intro
-    .to(sidebarWidgets, { autoAlpha: 1, scale: 1, y: 0, duration: 0.7, stagger: 0.07 }, '-=0.55')
-    .to(heroCopyBits, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.09 }, '-=0.7')
-    .to('.hero-media > img', { autoAlpha: 1, scale: 1, duration: 0.9 }, '-=0.75')
-    .to('.hero-card', { autoAlpha: 1, scale: 1, y: 0, duration: 0.8, ease: 'back.out(1.6)', stagger: 0.12 }, '-=0.5');
 
   /* ——— Hero exit: pinned stage dissolves as you scroll (desktop) ——— */
 
   ScrollTrigger.matchMedia({
     '(min-width: 901px)': () => {
+      // Transform/opacity only — no blur or letter-spacing, they jank the scrub.
       gsap.timeline({
         scrollTrigger: {
           trigger: '.hero-pin',
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 0.6,
+          scrub: 0.4,
         },
       })
-        .to('.hero-wordmark', { yPercent: -18, autoAlpha: 0.06, letterSpacing: '0.02em', ease: 'none' }, 0)
-        .to(heroCopyBits, { yPercent: -140, autoAlpha: 0, stagger: 0.05, ease: 'power1.in' }, 0.05)
-        .to('.hero-media > img', { filter: 'blur(34px)', autoAlpha: 0.2, ease: 'none' }, 0.15)
-        .to('.hero-card-projects', { x: '-22vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.1)
-        .to('.hero-card-traits', { x: '18vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.15);
+        .to('.hero-wordmark', { yPercent: -35, autoAlpha: 0.08, ease: 'none' }, 0)
+        .to(heroCopyBits, { yPercent: -130, autoAlpha: 0, stagger: 0.04, ease: 'power1.in' }, 0)
+        .to('.hero-media > img', { yPercent: -8, scale: 0.95, autoAlpha: 0.15, ease: 'none' }, 0.1)
+        .to('.hero-card-projects', { x: '-22vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.05)
+        .to('.hero-card-traits', { x: '18vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.1);
 
       /* ——— Work: vertical scroll drives horizontal travel ——— */
       const track = document.querySelector('.work-track');
@@ -177,7 +175,7 @@ function main() {
             trigger: '.work-pin',
             start: 'top top',
             end: 'bottom bottom',
-            scrub: 0.5,
+            scrub: 0.4,
             invalidateOnRefresh: true,
           },
         });
@@ -272,7 +270,6 @@ function main() {
   gsap.from('.footer-wordmark', {
     yPercent: 45,
     autoAlpha: 0,
-    letterSpacing: '0.12em',
     ease: 'power2.out',
     scrollTrigger: {
       trigger: '.footer',
