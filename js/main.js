@@ -116,12 +116,31 @@ function main() {
     new Promise((r) => setTimeout(r, 1200)),
   ]);
 
+  const revealAllNow = () => {
+    pre?.remove();
+    gsap.set([
+      '.hero-wordmark', '.ghost-nav a', '.hero-figure', ...heroFront,
+      '.hero-corner', '.hero-card',
+    ], { autoAlpha: 1, x: 0, y: 0, xPercent: 0, yPercent: 0, scale: 1 });
+    initCounters(true);
+  };
+
+  const qp = new URLSearchParams(location.search);
+  if (qp.has('nopre')) revealAllNow();
+
+  // Safety net: if anything stalls the intro (fonts, CDN), never leave the
+  // user staring at the preloader — force everything visible.
+  setTimeout(() => {
+    if (document.querySelector('.preloader')) revealAllNow();
+  }, 4000);
+
   fontsReady.then(() => {
+    if (!document.querySelector('.preloader')) return;
     gsap.timeline({
       defaults: { ease: 'expo.out' },
       onComplete: () => { pre?.remove(); initCounters(false); },
     })
-      .to('.pre-wordmark', { xPercent: 0, duration: 0.65 })
+      .to('.pre-wordmark', { xPercent: 0, autoAlpha: 1, duration: 0.65 })
       .to(pre, { yPercent: -100, duration: 0.55, ease: 'expo.inOut', delay: 0.2 })
       // Wordmark rises out of its mask as one piece (® breaks char-splitting)
       .from('.hero-wordmark', { yPercent: 112, duration: 0.75 }, '-=0.28')
@@ -132,17 +151,18 @@ function main() {
       .to('.hero-card', { autoAlpha: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.5)', stagger: 0.09 }, '-=0.35');
   });
 
-  // Sidebar assembles as soon as the story starts scrolling (desktop only)
+  // Sidebar assembles piece-by-piece scrubbed to hero progress (nesh move) —
+  // and disassembles again when you scroll back to the top.
   if (desktop.matches) {
-    ScrollTrigger.create({
-      trigger: '.hero-pin',
-      start: '3% top',
-      once: true,
-      onEnter: () => {
-        gsap.to(sidebarWidgets, {
-          autoAlpha: 1, scale: 1, y: 0,
-          duration: 0.5, stagger: 0.05, ease: 'expo.out',
-        });
+    gsap.to(sidebarWidgets, {
+      autoAlpha: 1, scale: 1, y: 0,
+      stagger: 0.12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.hero-pin',
+        start: '2% top',
+        end: '60% bottom',
+        scrub: 0.4,
       },
     });
   }
@@ -200,12 +220,12 @@ function main() {
           duration: 0.7,
           stagger: 0.1,
           ease: 'power2.out',
-          scrollTrigger: { trigger: el, start: 'top 82%' },
+          scrollTrigger: { trigger: el, start: 'top 82%' , toggleActions: 'play none none reverse' },
         });
       } else {
         gsap.from(el, {
           y: 40, autoAlpha: 0, duration: 0.7, ease: 'power2.out',
-          scrollTrigger: { trigger: el, start: 'top 82%' },
+          scrollTrigger: { trigger: el, start: 'top 82%' , toggleActions: 'play none none reverse' },
         });
       }
     });
@@ -218,7 +238,7 @@ function main() {
   gsap.utils.toArray('.label, .section-intro').forEach((el) => {
     gsap.from(el, {
       autoAlpha: 0, y: 18, duration: 0.6, ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 88%' },
+      scrollTrigger: { trigger: el, start: 'top 88%' , toggleActions: 'play none none reverse' },
     });
   });
 
@@ -226,35 +246,111 @@ function main() {
     gsap.from(el, {
       autoAlpha: 0, scale: 0.88, y: 30, duration: 1.0, ease: 'expo.out',
       delay: (i % 3) * 0.08,
-      scrollTrigger: { trigger: el, start: 'top 88%' },
+      scrollTrigger: { trigger: el, start: 'top 88%' , toggleActions: 'play none none reverse' },
     });
   });
 
   // Work cards pop against the pinned panel's own scroll
   gsap.from('.work-card', {
     autoAlpha: 0, scale: 0.8, y: 30, duration: 1.0, ease: 'expo.out', stagger: 0.08,
-    scrollTrigger: { trigger: '.work-pin', start: 'top 55%' },
+    scrollTrigger: { trigger: '.work-pin', start: 'top 55%' , toggleActions: 'play none none reverse' },
   });
 
-  /* ——— Timeline: one choreographed build — the line draws down and the
-     year cards cascade after it, regardless of how tall the screen is ——— */
+  /* ——— Timeline: nesh's curved path — an S-curve threads through the
+     alternating cards, drawing itself as you scroll, dot nodes popping
+     at each card's edge ——— */
 
   const timeline = document.querySelector('.timeline');
-  if (timeline) {
+  if (timeline && desktop.matches) {
+    const svg = timeline.querySelector('.tl-path');
+    const line = svg.querySelector('.tl-line');
     const cards = gsap.utils.toArray('.tl-card');
-    const build = gsap.timeline({
-      defaults: { ease: 'expo.out' },
-      scrollTrigger: { trigger: timeline, start: 'top 72%' },
+    const NS = 'http://www.w3.org/2000/svg';
+    const dots = cards.map(() => {
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('class', 'tl-dot');
+      c.setAttribute('r', '6');
+      svg.appendChild(c);
+      return c;
     });
-    build.from('.timeline-line', {
-      scaleY: 0, transformOrigin: 'top center', duration: 1.8, ease: 'power2.inOut',
-    }, 0);
+
+    let pathLen = 0;
+    const computeGeometry = () => {
+      // offsetLeft/Top are transform-free: entrance tweens shift the cards,
+      // and the path must anchor to their resting layout positions.
+      const W = timeline.offsetWidth;
+      const H = timeline.offsetHeight;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      const pts = cards.map((card, i) => {
+        const leftSide = i % 2 === 0;
+        return {
+          x: leftSide ? card.offsetLeft + card.offsetWidth + 10 : card.offsetLeft - 10,
+          y: card.offsetTop + card.offsetHeight * 0.55,
+          sign: leftSide ? 1 : -1,
+        };
+      });
+      const box = { width: W };
+      const k = Math.min(box.width * 0.28, 340);
+      let d = `M ${pts[0].x} ${pts[0].y}`;
+      for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i];
+        d += ` C ${a.x + a.sign * k} ${a.y}, ${b.x + b.sign * k} ${b.y}, ${b.x} ${b.y}`;
+      }
+      line.setAttribute('d', d);
+      pts.forEach((p, i) => {
+        dots[i].setAttribute('cx', p.x);
+        dots[i].setAttribute('cy', p.y);
+      });
+      pathLen = line.getTotalLength();
+      line.style.strokeDasharray = pathLen;
+    };
+
+    computeGeometry();
+    ScrollTrigger.addEventListener('refreshInit', computeGeometry);
+
+    gsap.fromTo(line,
+      { strokeDashoffset: () => pathLen },
+      {
+        strokeDashoffset: 0,
+        ease: 'none',
+        immediateRender: true,
+        scrollTrigger: {
+          trigger: timeline,
+          start: 'top 62%',
+          end: 'bottom 78%',
+          scrub: 0.5,
+          invalidateOnRefresh: true,
+        },
+      });
+
     cards.forEach((card, i) => {
-      const at = 0.15 + i * 0.22;
-      build.from(card, { autoAlpha: 0, x: -44, y: 20, scale: 0.96, duration: 0.9 }, at);
-      build.from(card.querySelector('.tl-year'), {
-        x: -28, autoAlpha: 0, duration: 0.6, ease: 'back.out(1.7)',
-      }, at + 0.12);
+      gsap.from(card, {
+        autoAlpha: 0,
+        x: (i % 2 === 0 ? -60 : 60),
+        scale: 0.96,
+        duration: 0.9,
+        ease: 'expo.out',
+        scrollTrigger: { trigger: card, start: 'top 82%' , toggleActions: 'play none none reverse' },
+      });
+      gsap.from(dots[i], {
+        attr: { r: 0 },
+        autoAlpha: 0,
+        duration: 0.45,
+        ease: 'back.out(2.2)',
+        scrollTrigger: { trigger: card, start: 'top 70%' , toggleActions: 'play none none reverse' },
+      });
+      gsap.from(card.querySelector('.tl-year'), {
+        yPercent: 60, autoAlpha: 0, duration: 0.7, ease: 'back.out(1.6)',
+        scrollTrigger: { trigger: card, start: 'top 78%' , toggleActions: 'play none none reverse' },
+      });
+    });
+  } else if (timeline) {
+    // Mobile: simple staggered entrances
+    gsap.utils.toArray('.tl-card').forEach((card) => {
+      gsap.from(card, {
+        autoAlpha: 0, y: 30, duration: 0.8, ease: 'expo.out',
+        scrollTrigger: { trigger: card, start: 'top 88%' , toggleActions: 'play none none reverse' },
+      });
     });
   }
 
@@ -262,12 +358,12 @@ function main() {
 
   gsap.from('.cap-pill', {
     scale: 0.55, autoAlpha: 0, duration: 0.7, ease: 'back.out(1.8)', stagger: 0.09,
-    scrollTrigger: { trigger: '.statement', start: 'top 78%' },
+    scrollTrigger: { trigger: '.statement', start: 'top 78%' , toggleActions: 'play none none reverse' },
   });
 
   gsap.from('.statement', {
     autoAlpha: 0, y: 30, duration: 0.8, ease: 'power2.out',
-    scrollTrigger: { trigger: '.statement', start: 'top 85%' },
+    scrollTrigger: { trigger: '.statement', start: 'top 85%' , toggleActions: 'play none none reverse' },
   });
 
   /* ——— Footer wordmark rises and tightens ——— */
@@ -283,4 +379,14 @@ function main() {
       scrub: 0.6,
     },
   });
+
+  // QA hook: ?qy=<px> jumps to a scroll position, then re-syncs triggers
+  const qy = parseInt(qp.get('qy') || '0', 10);
+  if (qy) {
+    window.scrollTo(0, qy);
+    setTimeout(() => {
+      window.scrollTo(0, qy);
+      ScrollTrigger.refresh();
+    }, 400);
+  }
 }

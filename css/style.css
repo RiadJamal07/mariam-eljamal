@@ -5,7 +5,8 @@
    of stacked widgets, dark work section, chat CTA, giant footer wordmark.
    Palette adapted from Mariam's character sheet:
    cream #F2E6D5 · beige #E7D4B5 · warm brown #8B5E3C · dark brown #5A3A24
-   black #1A1A1A · olive #6E7A3D · dusty pink #D88C8C · terracotta #C96A4A */
+   black #1A1A1A · olive #6E7A3D · dusty pink #D88C8C · gold #C79A45 (her jewelry —
+   the accent role; the terracotta from the old Lovable page is retired) */
 
 :root {
   --canvas: #E3D8C2;
@@ -18,9 +19,9 @@
   --ink: #1A1A1A;
   --ink-70: rgba(26, 26, 26, 0.7);
   --ink-50: rgba(26, 26, 26, 0.5);
-  --accent: #C96A4A;
-  --accent-hover: #B25538;
-  --on-accent: #FFF6EC;
+  --accent: #C79A45;
+  --accent-hover: #B0842F;
+  --on-accent: #1A1A1A;
   --dark-1: #1A1A1A;
   --dark-2: #33261C;
   --sidebar-w: 300px;
@@ -170,6 +171,7 @@ h3 {
   font-size: clamp(3rem, 11vw, 11rem);
   letter-spacing: -0.04em;
   transform: translateX(-115%);
+  opacity: 0; /* revealed by the intro — never show the parked (cropped) state */
 }
 
 .no-anim .preloader { display: none; }
@@ -426,8 +428,8 @@ h3 {
   left: 50%;
   bottom: -2px;
   transform: translateX(-50%);
-  height: min(74vh, 100vw);
-  aspect-ratio: 380 / 620;
+  height: min(70vh, 110vw);
+  aspect-ratio: 773 / 1142;
 }
 
 .hero-figure img {
@@ -529,41 +531,61 @@ h3 {
 .trait-list li::before { content: "✦ "; color: var(--accent); }
 
 
-/* ——— Timeline ——— */
+/* ——— Timeline: alternating cards on a drawn curve (nesh) ——— */
 
-.timeline { position: relative; display: flex; flex-direction: column; gap: 28px; max-width: 780px; }
+.timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 90px;
+  padding: 30px 0 60px;
+}
 
-.timeline-line {
+.tl-path {
   position: absolute;
-  left: 26px;
-  top: 10px;
-  bottom: 10px;
-  width: 1px;
-  background: var(--hairline-strong);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.tl-line {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.tl-dot {
+  fill: var(--accent);
+  stroke: var(--canvas);
+  stroke-width: 3;
 }
 
 .tl-card {
-  display: grid;
-  grid-template-columns: 110px minmax(0, 1fr);
-  gap: 20px;
-  padding: 26px 28px;
-  margin-left: 52px;
-  transition: transform 0.3s ease, background 0.3s ease;
+  position: relative;
+  z-index: 1;
+  width: min(560px, 68%);
+  display: block;
+  padding: 34px 36px;
+  transition: background 0.3s ease;
 }
 
-.tl-card:hover { transform: translateX(6px); }
+.tl-card:nth-of-type(even) { margin-left: auto; }
 
 .tl-year {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(2.6rem, 4vw, 3.6rem);
+  font-size: clamp(3rem, 5vw, 4.6rem);
   line-height: 1;
   color: var(--accent);
+  display: block;
+  margin-bottom: 16px;
 }
 
-.tl-body h3 { font-size: 1.25rem; margin-bottom: 8px; }
+.tl-body h3 { font-size: 1.5rem; margin-bottom: 10px; }
 
-.tl-body p { font-size: 0.95rem; color: var(--ink-70); }
+.tl-body p { font-size: 1rem; color: var(--ink-70); }
 
 .tl-meta {
   display: flex;
@@ -641,7 +663,16 @@ h3 {
 
 .work-card:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(255, 255, 255, 0.3); }
 
-.work-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+.work-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+
+.work-media {
+  width: 100%;
+  height: 175px;
+  object-fit: cover;
+  border-radius: var(--r-sm);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 18px;
+}
 
 .work-tags span {
   font-size: 0.7rem;
@@ -995,8 +1026,9 @@ h3 {
   .services-wrap { grid-template-columns: minmax(0, 1fr); }
   .faq-grid { grid-template-columns: minmax(0, 1fr); }
 
-  .tl-card { grid-template-columns: minmax(0, 1fr); margin-left: 40px; }
-  .timeline-line { left: 20px; }
+  .tl-path { display: none; }
+  .tl-card { width: 100%; }
+  .timeline { gap: 24px; }
   .tl-year { font-size: 2.4rem; }
 
 }

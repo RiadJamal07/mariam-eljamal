@@ -4,18 +4,22 @@ Personal site for Mariam el Jamal, independent data consultant.
 **Complicated problems, simple solutions.**
 
 A scroll-driven one-pager inspired by [heynesh.com](https://heynesh.com/):
-fixed sidebar of stacked glass widgets, preloader wordmark, pinned hero that
-dissolves as you scroll, a journey timeline that draws itself, a dark
-"Selected Work" section where cards travel horizontally on vertical scroll,
-capability pills embedded mid-sentence, a chat-mockup CTA, and a giant-wordmark
-FAQ footer — reinterpreted in Mariam's own brand palette (warm cream, terracotta,
-near-black) from her character mood board.
+full-viewport poster hero (edge-to-edge gold wordmark with Mariam's illustrated
+figure standing over it), preloader wordmark, a fixed sidebar of glass widgets
+that assembles as you scroll and disassembles on the way back up, a journey
+timeline threaded on a self-drawing S-curve with dot nodes, a dark full-bleed
+"Selected Work" section where illustrated cards travel horizontally under the
+sidebar as you scroll vertically, capability pills embedded mid-sentence, a
+chat-mockup CTA, and a giant-wordmark FAQ footer.
+
+All in Mariam's own brand: warm cream canvas, black, and the gold of her
+jewelry as the accent — with her original character art (cutout poses and
+painted scenes) throughout.
 
 ## Stack
 
 - Static HTML/CSS — no build step.
-- [Lenis](https://lenis.darkroom.engineering/) smooth scroll + [GSAP](https://gsap.com/)
-  (ScrollTrigger, SplitText) from CDN for the animation system.
+- [GSAP](https://gsap.com/) (ScrollTrigger, SplitText) from CDN; native scrolling.
 - Typography: [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque)
   (display) + [Hanken Grotesk](https://fonts.google.com/specimen/Hanken+Grotesk) (body).
 - Fully degrades: no JS / reduced motion / `?static` → clean static page.
@@ -25,8 +29,8 @@ near-black) from her character mood board.
 ```
 index.html      — the whole page
 css/style.css   — design system + layout (+ static-mode fallbacks)
-js/main.js      — preloader, sidebar assembly, pins/scrubs, reveals, counters
-assets/         — character illustrations (from her mood board), favicon
+js/main.js      — preloader, sidebar assembly, pins/scrubs, timeline curve
+assets/         — character art, scene illustrations, favicon
 ```
 
 ## Run locally
