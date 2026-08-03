@@ -94,7 +94,7 @@ function main() {
 
   /* ——— Lenis smooth scroll wired to ScrollTrigger ——— */
   if (typeof Lenis !== 'undefined') {
-    const lenis = new Lenis({ lerp: 0.18, wheelMultiplier: 1.15 });
+    const lenis = new Lenis({ lerp: 0.22, wheelMultiplier: 1.35 });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -113,16 +113,19 @@ function main() {
 
   const pre = document.querySelector('.preloader');
   const sidebarWidgets = gsap.utils.toArray('.sidebar > *');
-  const heroCopyBits = gsap.utils.toArray('.hero-kicker, .hero-title, .hero-actions, .hero-scroll-hint');
+  const heroFront = gsap.utils.toArray('.hero-title, .hero-actions');
 
   gsap.set('.pre-wordmark', { xPercent: -115 });
-  gsap.set(sidebarWidgets, { autoAlpha: 0, scale: 0.9, y: 12 });
-  gsap.set(heroCopyBits, { autoAlpha: 0, y: 22 });
-  gsap.set('.hero-media > img', { autoAlpha: 0, scale: 0.96 });
+  gsap.set('.ghost-nav a', { autoAlpha: 0, y: -14 });
+  gsap.set('.hero-figure', { autoAlpha: 0, yPercent: 8 });
+  gsap.set(heroFront, { autoAlpha: 0, y: 26 });
+  gsap.set('.hero-corner', { autoAlpha: 0 });
   gsap.set('.hero-card', { autoAlpha: 0, scale: 0.7, y: 14 });
+  // nesh move: no sidebar at load — it assembles once you scroll (desktop)
+  if (desktop.matches) gsap.set(sidebarWidgets, { autoAlpha: 0, scale: 0.9, y: 12 });
 
   // Wait for the display font (capped at 1.2s) so the preloader wordmark
-  // never slides in mid-fontswap — that's what "mangled" looks like.
+  // never slides in mid-fontswap.
   const fontsReady = Promise.race([
     document.fonts?.ready ?? Promise.resolve(),
     new Promise((r) => setTimeout(r, 1200)),
@@ -133,16 +136,31 @@ function main() {
       defaults: { ease: 'expo.out' },
       onComplete: () => { pre?.remove(); initCounters(false); },
     })
-      .to('.pre-wordmark', { xPercent: 0, duration: 0.7 })
-      .to(pre, { yPercent: -100, duration: 0.6, ease: 'expo.inOut', delay: 0.25 })
-      // Whole wordmark rises out of its own mask — no char splitting,
-      // so the ® superscript can't break the metrics.
-      .from('.hero-wordmark', { yPercent: 112, duration: 0.8 }, '-=0.3')
-      .to(sidebarWidgets, { autoAlpha: 1, scale: 1, y: 0, duration: 0.55, stagger: 0.05 }, '-=0.5')
-      .to(heroCopyBits, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.07 }, '-=0.45')
-      .to('.hero-media > img', { autoAlpha: 1, scale: 1, duration: 0.7 }, '-=0.5')
-      .to('.hero-card', { autoAlpha: 1, scale: 1, y: 0, duration: 0.55, ease: 'back.out(1.5)', stagger: 0.1 }, '-=0.35');
+      .to('.pre-wordmark', { xPercent: 0, duration: 0.65 })
+      .to(pre, { yPercent: -100, duration: 0.55, ease: 'expo.inOut', delay: 0.2 })
+      // Wordmark rises out of its mask as one piece (® breaks char-splitting)
+      .from('.hero-wordmark', { yPercent: 112, duration: 0.75 }, '-=0.28')
+      .to('.hero-figure', { autoAlpha: 1, yPercent: 0, duration: 0.7 }, '-=0.55')
+      .to('.ghost-nav a', { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.04 }, '-=0.55')
+      .to(heroFront, { autoAlpha: 1, y: 0, duration: 0.55, stagger: 0.08 }, '-=0.4')
+      .to('.hero-corner', { autoAlpha: 1, duration: 0.5 }, '-=0.4')
+      .to('.hero-card', { autoAlpha: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.5)', stagger: 0.09 }, '-=0.35');
   });
+
+  // Sidebar assembles as soon as the story starts scrolling (desktop only)
+  if (desktop.matches) {
+    ScrollTrigger.create({
+      trigger: '.hero-pin',
+      start: '3% top',
+      once: true,
+      onEnter: () => {
+        gsap.to(sidebarWidgets, {
+          autoAlpha: 1, scale: 1, y: 0,
+          duration: 0.5, stagger: 0.05, ease: 'expo.out',
+        });
+      },
+    });
+  }
 
   /* ——— Hero exit: pinned stage dissolves as you scroll (desktop) ——— */
 
@@ -157,9 +175,11 @@ function main() {
           scrub: 0.4,
         },
       })
-        .to('.hero-wordmark', { yPercent: -35, autoAlpha: 0.08, ease: 'none' }, 0)
-        .to(heroCopyBits, { yPercent: -130, autoAlpha: 0, stagger: 0.04, ease: 'power1.in' }, 0)
-        .to('.hero-media > img', { yPercent: -8, scale: 0.95, autoAlpha: 0.15, ease: 'none' }, 0.1)
+        .to('.hero-wordmark', { yPercent: -50, autoAlpha: 0.05, ease: 'none' }, 0)
+        .to('.ghost-nav a', { y: -30, autoAlpha: 0, stagger: 0.03, ease: 'power1.in' }, 0)
+        .to(heroFront, { yPercent: -120, autoAlpha: 0, stagger: 0.04, ease: 'power1.in' }, 0)
+        .to('.hero-corner', { autoAlpha: 0, ease: 'none' }, 0.1)
+        .to('.hero-figure', { yPercent: 14, scale: 0.97, autoAlpha: 0.25, ease: 'none' }, 0.1)
         .to('.hero-card-projects', { x: '-22vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.05)
         .to('.hero-card-traits', { x: '18vw', scale: 0.4, autoAlpha: 0, ease: 'power1.in' }, 0.1);
 

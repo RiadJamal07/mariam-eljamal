@@ -80,43 +80,54 @@
 
   <main class="main">
 
-    <!-- ——— Hero: 280vh pin, sticky stage dissolves on scroll ——— -->
+    <!-- ——— Hero: full-viewport poster, nesh composition ——— -->
     <section class="hero-pin" id="home">
       <div class="hero-sticky">
         <div class="wm-mask">
           <h1 class="hero-wordmark" aria-label="Mariam el Jamal">MARIAM<span class="reg">®</span></h1>
         </div>
 
-        <div class="hero-stage">
-          <div class="hero-copy">
-            <p class="hero-kicker">Complicated problems, simple solutions.<br>That's Mariam.</p>
-            <h2 class="hero-title">Data,<br>Applied<br>Differently.</h2>
-            <div class="hero-actions">
-              <a class="btn btn-accent" href="mailto:moe13@mail.aub.edu?subject=Discovery%20call">Book a Call</a>
-              <a class="btn btn-ghost" href="#journey">My Journey</a>
-            </div>
-            <p class="hero-scroll-hint">Scroll — the story starts in 2019 ↓</p>
+        <nav class="ghost-nav" aria-label="Hero navigation">
+          <div class="ghost-group">
+            <a href="#home">Home</a>
+            <a href="#journey">About Me</a>
+            <a href="#work">Projects</a>
           </div>
-
-          <div class="hero-media">
-            <img src="assets/mariam-reading.webp" alt="Illustration of Mariam reading a book titled Plan, Grow, Be the lead" width="514" height="540">
-
-            <div class="glass-card hero-card hero-card-projects">
-              <span class="gc-num"><span data-count="15">0</span>+</span>
-              <span class="gc-label">Projects across UN agencies, NGOs &amp; research</span>
-            </div>
-
-            <div class="glass-card hero-card hero-card-traits">
-              <span class="gc-title">Plan · Grow · Be the Lead</span>
-              <ul class="trait-list">
-                <li>Kind</li>
-                <li>Ambitious</li>
-                <li>Disciplined</li>
-                <li>Thoughtful</li>
-                <li>Coffee lover</li>
-              </ul>
-            </div>
+          <div class="ghost-group">
+            <a href="#overview">What You Get</a>
+            <a href="#services">Services</a>
+            <a href="#faq">FAQ</a>
           </div>
+        </nav>
+
+        <div class="hero-figure">
+          <img src="assets/mariam-reading.webp" alt="Illustration of Mariam reading a book titled Plan, Grow, Be the lead" width="514" height="540">
+        </div>
+
+        <div class="hero-front">
+          <h2 class="hero-title">Data,<br>Applied<br>Differently.</h2>
+          <div class="hero-actions">
+            <a class="btn btn-accent" href="mailto:moe13@mail.aub.edu?subject=Discovery%20call">Book a Call</a>
+            <a class="btn btn-cream" href="#journey">About Me</a>
+          </div>
+        </div>
+
+        <p class="hero-corner hero-corner-left">The data consultant.<br>That's Mariam.</p>
+        <p class="hero-corner hero-corner-right">Working closely with your team to turn messy, complicated data into clear, decision-ready answers.</p>
+
+        <div class="glass-card glass-dark hero-card hero-card-projects">
+          <span class="gc-num"><span data-count="15">0</span>+</span>
+          <span class="gc-label">Projects across UN agencies, NGOs &amp; research</span>
+        </div>
+
+        <div class="glass-card glass-dark hero-card hero-card-traits">
+          <ul class="trait-list">
+            <li>Kind</li>
+            <li>Ambitious</li>
+            <li>Disciplined</li>
+            <li>Thoughtful</li>
+            <li>Coffee lover</li>
+          </ul>
         </div>
       </div>
     </section>

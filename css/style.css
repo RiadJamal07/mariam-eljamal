@@ -174,9 +174,10 @@ h3 {
 
 .no-anim .preloader { display: none; }
 
-/* Static mode (reduced motion / no GSAP): pins unwind everywhere */
-.no-anim .hero-pin, .no-anim .work-pin { height: auto; }
-.no-anim .hero-sticky { position: static; height: auto; overflow: visible; padding: 60px 0; }
+/* Static mode (reduced motion / no GSAP): pins unwind, hero keeps its poster */
+.no-anim .hero-pin { height: 100vh; }
+.no-anim .hero-sticky { position: relative; }
+.no-anim .work-pin { height: auto; }
 .no-anim .work-sticky { position: static; height: auto; overflow: visible; padding: 100px 28px 60px; }
 .no-anim .work-track { width: auto; overflow-x: auto; }
 
@@ -352,85 +353,147 @@ h3 {
 
 .section { padding: 130px 0 40px; }
 
-/* ——— Hero: pinned stage ——— */
+/* ——— Hero: full-viewport poster (nesh composition) ——— */
 
-.hero-pin { height: 170vh; }
-
-.wm-mask { overflow: hidden; position: relative; z-index: 0; }
+.hero-pin { height: 150vh; }
 
 .hero-sticky {
   position: sticky;
   top: 0;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   overflow: hidden;
-  padding-top: 20px;
+  padding-top: 14px;
 }
 
-.hero-scroll-hint {
-  margin-top: 40px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-50);
+/* Full-bleed poster: escape the sidebar column (sidebar overlays it on assemble) */
+@media (min-width: 901px) {
+  .hero-pin { margin-left: calc(-1 * (var(--sidebar-w) + var(--gutter) * 2 + 28px)); }
+  .hero-sticky { padding-left: 40px; padding-right: 40px; }
+  .hero-wordmark { font-size: clamp(4rem, calc((100vw - 80px) / 3.1), 28rem); }
 }
 
+.wm-mask { overflow: hidden; position: relative; z-index: 0; }
+
+/* Edge-to-edge wordmark: sized so MARIAM® spans the content column */
 .hero-wordmark {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(3.4rem, 13vw, 14rem);
-  line-height: 0.95;
+  font-size: clamp(4rem, calc((100vw - 400px) / 3.1), 28rem);
+  line-height: 0.92;
   letter-spacing: -0.04em;
   white-space: nowrap;
+  color: var(--accent);
 }
 
-.hero-stage {
+.hero-wordmark .reg { color: var(--accent); }
+
+.ghost-nav {
   position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
-  gap: 48px;
-  align-items: start;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
   margin-top: 10px;
 }
 
-.hero-kicker {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--ink-70);
-  margin-bottom: 28px;
+.ghost-group { display: flex; gap: 26px; }
+
+.ghost-nav a {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink);
+  transition: color 0.2s ease;
+}
+
+.ghost-nav a:hover { color: var(--accent); }
+
+/* Mariam stands bottom-center, over the wordmark */
+.hero-figure {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  height: min(62vh, 58vw);
+  aspect-ratio: 514 / 540;
+}
+
+.hero-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+}
+
+/* legibility gradient under the overlaid title */
+.hero-figure::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-md) var(--r-md) 0 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(10, 8, 6, 0.62));
+}
+
+.hero-front {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 7vh;
+  transform: translateX(-62%);
 }
 
 .hero-title {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(2.6rem, 5.2vw, 5rem);
-  line-height: 1.02;
+  font-size: clamp(2.4rem, 4.6vw, 4.6rem);
+  line-height: 1.0;
   letter-spacing: -0.02em;
-  margin-bottom: 36px;
+  color: #FFF6EC;
+  margin-bottom: 26px;
 }
 
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
-.hero-media {
-  position: relative;
-  margin-top: -7.5vw; /* illustration climbs over the wordmark, nesh-style */
+.btn-cream {
+  background: #FFF6EC;
+  color: var(--ink);
 }
 
-.hero-media > img {
-  width: 100%;
-  border-radius: var(--r-md);
-  border: 1px solid var(--glass-border);
+.btn-cream:hover { background: #EFE3D2; }
+
+.hero-corner {
+  position: absolute;
+  z-index: 2;
+  bottom: 4vh;
+  max-width: 220px;
+  font-size: 0.9rem;
+  color: var(--ink-70);
 }
 
-.hero-card { position: absolute; padding: 14px 16px; }
+.hero-corner-left { left: 40px; font-weight: 600; color: var(--ink); }
+.hero-corner-right { right: 40px; text-align: left; }
 
-.hero-card-projects { left: -56px; bottom: 88px; max-width: 190px; }
+.hero-card { position: absolute; z-index: 2; padding: 14px 16px; }
 
-.hero-card-traits { right: 0; bottom: -26px; max-width: 230px; }
+.glass-dark {
+  background: rgba(26, 26, 26, 0.55);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.glass-dark .gc-label { color: rgba(255, 255, 255, 0.72); }
+
+.glass-dark .trait-list li {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.hero-card-projects { left: 6%; bottom: 26vh; max-width: 190px; }
+
+.hero-card-traits { right: 4%; bottom: 22vh; max-width: 210px; }
 
 .gc-num {
   font-family: var(--font-display);
@@ -526,7 +589,7 @@ h3 {
   margin: 90px calc(-1 * var(--gutter)) 0 -28px;
 }
 
-.work-pin { height: 240vh; }
+.work-pin { height: 200vh; }
 
 .work-sticky {
   position: sticky;
@@ -874,10 +937,6 @@ h3 {
 
 /* ——— Responsive ——— */
 
-@media (max-width: 1100px) {
-  .hero-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); }
-  .hero-card-projects { left: -12px; }
-}
 
 @media (max-width: 900px) {
   .topbar { display: flex; }
@@ -889,9 +948,25 @@ h3 {
   /* Pins unwind on mobile: normal flow, native horizontal scroll */
   .hero-pin { height: auto; }
   .hero-sticky { position: static; height: auto; overflow: visible; padding: 40px 0 60px; }
-  .hero-stage { grid-template-columns: minmax(0, 1fr); }
-  .hero-media { margin-top: 40px; max-width: 400px; }
-  .hero-wordmark { font-size: clamp(2.6rem, 14vw, 6rem); white-space: normal; }
+  .hero-wordmark { font-size: calc((100vw - 44px) / 3.1); }
+  .ghost-nav { display: none; }
+  .hero-figure {
+    position: static;
+    transform: none;
+    height: auto;
+    aspect-ratio: auto;
+    max-width: 440px;
+    margin-top: 28px;
+  }
+  .hero-figure img { height: auto; border-radius: var(--r-md); }
+  .hero-figure::after { display: none; }
+  .hero-front { position: static; transform: none; margin-top: 28px; }
+  .hero-title { color: var(--ink); }
+  .btn-cream { background: transparent; border-color: var(--hairline-strong); }
+  .hero-corner { position: static; max-width: none; margin-top: 18px; }
+  .hero-corner-left { display: none; }
+  .hero-card { position: static; margin-top: 14px; max-width: 320px; }
+  .hero-card-projects { display: none; }
 
   .work-pin { height: auto; }
   .work-sticky { position: static; height: auto; overflow: visible; padding: 90px var(--gutter) 50px; }
@@ -908,13 +983,10 @@ h3 {
   .timeline-line { left: 20px; }
   .tl-year { font-size: 2.4rem; }
 
-  .hero-card-traits { right: 0; bottom: -30px; }
 }
 
 @media (max-width: 520px) {
   .statement { font-size: 1.5rem; }
   .cap-desc { max-width: 100%; }
-  .hero-card-projects { display: none; }
-  .hero-card-traits { position: static; margin-top: 12px; max-width: none; }
-  .hero-media { max-width: 100%; }
+  .hero-figure { max-width: 100%; }
 }
